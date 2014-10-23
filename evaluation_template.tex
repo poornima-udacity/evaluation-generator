@@ -1,0 +1,149 @@
+\documentclass{scrartcl} 	
+\usepackage{geometry}                		% See geometry.pdf to learn the layout options. There are lots.
+\geometry{letterpaper}                   		% ... or a4paper or a5paper or ... 
+%\geometry{landscape}                		% Activate for for rotated page geometry
+%\usepackage[parfill]{parskip}    		% Activate to begin paragraphs with an empty line rather than an indent
+\usepackage{graphicx}				% Use pdf, png, jpg, or eps§ with pdflatex; use eps in DVI mode
+								% TeX will automatically convert eps --> pdf in pdflatex		
+\usepackage{amssymb}
+\usepackage[usenames, dvipsnames]{color}
+\definecolor{mygray}{gray}{0.4}
+\definecolor{darkolivegreen}{rgb}{0.33, 0.42, 0.18}
+\definecolor{cerulean}{rgb}{0.0, 0.48, 0.65}
+\definecolor{caputmortuum}{rgb}{0.54, 0.2, 0.14}
+
+\usepackage[defaultsans]{droidsans}
+\renewcommand*\familydefault{\sfdefault} %% Only if the base font of the document is to be typewriter style
+\usepackage[T1]{fontenc}
+\usepackage{float}
+\restylefloat{table}
+
+\usepackage{xcolor}
+
+
+
+
+\setkomafont{section}{\mysection}
+\newcommand{\mysection}[1]{%
+    \Large\sf\bf%
+    \setlength{\fboxsep}{0cm}%already boxed
+    \colorbox{gray!10}{%
+        \begin{minipage}{\linewidth}%
+            \vspace*{2pt}%Space before
+            #1
+            \vspace*{2pt}%Space after
+        \end{minipage}%
+    }}
+
+
+%\date{}							% Activate to display a given date or no date
+
+\newcommand{\tab}[1]{\hspace{.1\textwidth}\rlap{#1}}
+
+\begin{document}
+%\section{}
+%\subsection{}
+
+%nanodegree banner
+\begin{center}
+  \makebox[\textwidth]{\includegraphics[width=\textwidth]{Nanodegree_evaluation_banner.png}}
+\end{center}
+
+
+%name and degree and project
+\begin{table} [h]
+\begin{tabular}{l l}
+\textbf{\normalsize{\color{mygray}STUDENT}} & \Huge{*studentname*} \\
+\\
+\textbf{\normalsize{\color{mygray}NANODEGREE} } & \Large{Front-End Web Developer} \\
+\\
+\textbf{\normalsize{\color{mygray}PROJECT}} & \Large{Mockup To Website}
+
+\end{tabular}
+\end{table}
+
+%horizontal line under project
+\noindent\makebox[\linewidth]{\rule{\textwidth}{0.4pt}}
+
+% evaluation begins here
+
+%personal message
+
+ \vspace{0.5 cm}
+
+
+*personalmessage*
+
+\begin{table} [H]
+	\begin{tabular}{l c}
+		\Large{\textbf{Design} } & \textcolor{cerulean}{\textbf{*designconclusion*}} \\
+	\end{tabular}
+\end{table}
+
+
+\begin{itemize}
+	 \item *design1*
+
+	 
+	 
+	\item *design2*
+
+	
+	\item *design3*
+
+\end{itemize}
+
+\begin{table}[H] 
+	\begin{tabular}{l c}
+		\Large{\textbf{Responsiveness} } & \textcolor{cerulean}{\textbf{*responsiveconclusion*}} \\
+	\end{tabular}
+\end{table}
+
+
+\begin{itemize}
+	 \item *responsive1*
+
+	 
+	\item *responsive2*
+
+	 
+	\item *responsive3*
+
+	
+\end{itemize}
+	
+
+\begin{table} [H]
+	\begin{tabular}{l c}
+		\Large{\textbf{Separation of Concerns} } & \textcolor{cerulean}{\textbf{*separationofconcernsconclusion*}} \\
+	\end{tabular}
+\end{table}
+
+\begin{itemize}
+	 \item *separationofconcerns1*
+
+	 
+\end{itemize}
+	
+
+\begin{table} [H]
+	\begin{tabular}{l c}
+		\Large{\textbf{Code Quality} } & \textcolor{cerulean}{\textbf{*codequalityconclusion*}} \\
+	\end{tabular}
+\end{table}
+
+\begin{itemize}
+	 \item *codequality1*
+
+	 
+\end{itemize}
+
+\section*{\center{{\small\color{mygray}{PROJECT EVALUATION}} \\ \vspace{0.5 cm} \Large{\color{cerulean}{*projectconclusion*}}}\vspace{0.4 cm}}
+
+
+
+
+
+
+
+\end{document}  
