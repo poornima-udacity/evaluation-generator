@@ -1,4 +1,4 @@
-evaluation-generator
+#evaluation-generator
 ====================
 
 How to use this script:
