@@ -19,13 +19,13 @@ latex!
 
 ##to dos to refine this script: 
 
-1. Write code quality items in a “student friendly” format in the html form, e.g. UTF-8 not used -> The project does not use UTF-8 for character encoding.
-2. add version number in the html form
-3. add help text “\par”  \\ for newline in personalmessage field. 
+1. Write code quality items in a “student friendly” format in the html form, e.g. UTF-8 not used -> The project does not use UTF-8 for character encoding. - done
+2. add version number in the html form - done
+3. add help text “\par”  \\ for newline in personalmessage field. - done
 4. prefilled suggestions for each of the “suggestion fields” in the form. 
 5. download the csv file from the script. 
-6. rename the generated file to incorporate the coursename, version and studentname
+6. rename the generated file to incorporate the coursename, version and studentname - done
 7. give user the ability to choose the student name, so that csv can have more than one student information. 
-8. fix the code so that latex runs without errors. 
+8. fix the code so that latex runs without errors. - done
 9. write code for exceeds specifications. 
 10. run the latex file through python to generate pdf. 
