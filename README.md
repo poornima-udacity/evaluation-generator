@@ -1,5 +1,9 @@
 #evaluation-generator
 ====================
+### generates latex for the evaluation based on the form responses. 
+
+##system requirements
+latex! 
 
 ##How to use this script:
 1. Fill out the html form: https://docs.google.com/a/knowlabs.com/forms/d/1aCC1ckzEnd4qF1r6VvWGoiDW9HZuDk44ZN7vglHdgxw/viewform
