@@ -35,7 +35,8 @@ for criteria in section_criteria:
 		section_criteria[criteria][key] = (section_criteria[criteria][key][0],
 			section_criteria[criteria][key][1] + "\\begin{itemize} *"  + key + "observation* *" + key + "suggestion* \end{itemize}")
 
-#this function creates a dict with yes and nos depending on whether the student satisfies a component from design.
+#this function creates a dict with yes and nos depending on whether the student satisfies a criteria from design.
+#function also creates separate dictionaries for observations and suggestions. 
 def get_section_dict(section_name):
 	with open('feedback.csv', 'rb') as csvfile:
 		feedbackreader = csv.reader(csvfile)
@@ -44,25 +45,23 @@ def get_section_dict(section_name):
 		student_performance = feedbackreader.next()
 
 		evaluation_dict = dict(zip(all_criteria, student_performance))
-		#print "evaluation_dict", evaluation_dict
+
 	section_dict = {k:v for (k,v) in evaluation_dict.iteritems() if (section_name in k and k[-1].isdigit()) }
 	observations_dict = {k:v for (k,v) in evaluation_dict.iteritems() if ("observation" in k and section_name in k) }
 	suggestions_dict = {k:v for (k,v) in evaluation_dict.iteritems() if ("suggestion" in k and section_name in k ) }
 
 	if section_name == "codequality":
-		observations_dict["codequality1observation"] =  evaluation_dict["codequality1"].strip()
-		suggestions_dict["codequality1suggestion"] = ""
+		observations_dict["codequality1observation"] =  "".join(evaluation_dict["codequality1"].split(",")).strip()
+		#" ".join(" ".join(evaluation_dict["codequality1"].split(",")).split(" ")) #"".join(evaluation_dict["codequality1"].split(","))
+		suggestions_dict["codequality1suggestion"] = evaluation_dict["codequality1suggestion"]
 
 	if section_name == "studentinfo":
 		section_dict["studentname"] = evaluation_dict["studentname"]
 		section_dict["personalmessage"] = evaluation_dict["personalmessage"]
 
-
-	#responsiveness_dict = {k:v for (k,v) in evaluation_dict.iteritems() if "responsiveness" in k}
-	#print "design dict", design_dict
-	#print evaluation_dict
 	return section_dict, observations_dict, suggestions_dict
 
+#to get student name and personal message. 
 def get_student_info():
 	student_info = {}
 	with open('feedback.csv', 'rb') as csvfile:
@@ -73,13 +72,14 @@ def get_student_info():
 		evaluation_dict = dict(zip(all_criteria, student_performance))
 	student_info["studentname"] =  evaluation_dict["studentname"]
 	student_info["personalmessage"] =  evaluation_dict["personalmessage"]
+	student_info["version"] = evaluation_dict["version"]
 	return student_info
 
 
 #this function creates appropriate statements for inserting in evaluation. 
 def get_section_evaluation(section_name):
+	
 	section_dict, observations_dict, suggestions_dict = get_section_dict(section_name)
-
 	section_evaluation = {}
 	section_conclusion = section_name + "conclusion"
 	section_evaluation[section_conclusion] = "Meets Specifications"
@@ -105,7 +105,7 @@ def get_section_evaluation(section_name):
 			section_evaluation[section_conclusion] = "Does Not Meet Specifications"
 	return section_evaluation
 
-
+#creating a dictionary of all appropriate statements and placeholders. 
 def get_all_evaluation():
 	all_evaluation = {}
 	section_names = ['design', 'responsive', 'separationofconcerns', 'codequality']
@@ -120,12 +120,13 @@ def get_all_evaluation():
 
 	return all_evaluation
 
-
+#inserts the evaluation into the latex file. 
 def insert_into_latex():
 	all_evaluation = get_all_evaluation()
 	template = open("evaluation_template.tex", 'r')
-
-	generated_evaluation = open("evaluation.tex", 'w')
+	evaluation_file_name = "Mockup To Website - Project Evaluation v" + all_evaluation["version"] + " - " + all_evaluation['studentname'] + ".tex"
+	#Mockup To Website - Project Evaluation v[number] - [student name]
+	generated_evaluation = open(evaluation_file_name, 'w')
 
 	for line in template:
 		for key, value in all_evaluation.iteritems():
@@ -135,6 +136,7 @@ def insert_into_latex():
 		generated_evaluation.write(line)
 	generated_evaluation.close()
 	template.close()
+
 
 insert_into_latex()
 
