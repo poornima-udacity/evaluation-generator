@@ -1,6 +1,6 @@
 #evaluation-generator
 ====================
-### generates latex for the evaluation based on the form responses. 
+generates latex for the evaluation based on the form responses. 
 
 ##system requirements
 latex! 
