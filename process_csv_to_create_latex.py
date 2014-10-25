@@ -5,7 +5,7 @@ import re
 import sys
 import gspread
 import getpass
-
+import os
 
 
 #_criteria dicts define the statement to put in the evaluation for wheather or not a student meets specification on a criteria.
@@ -165,6 +165,8 @@ def insert_into_latex(evaluation_dict):
 		generated_evaluation.write(line)
 	generated_evaluation.close()
 	template.close()
+	evaluation_file_name = "\ ".join(evaluation_file_name.split(" "))
+	os.system("pdflatex " + evaluation_file_name)
 
 
 if __name__ == "__main__":
@@ -178,6 +180,8 @@ if __name__ == "__main__":
 		evaluation_dict =  get_evaluation_dict(studentname, int(version))
     	print evaluation_dict, type(evaluation_dict)
     	insert_into_latex(evaluation_dict)
+
+    	
 
     	
 
