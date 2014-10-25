@@ -2,6 +2,10 @@ import csv
 import shutil
 import pprint
 import re
+import sys
+import gspread
+import getpass
+
 
 
 #_criteria dicts define the statement to put in the evaluation for wheather or not a student meets specification on a criteria.
@@ -35,24 +39,52 @@ for criteria in section_criteria:
 		section_criteria[criteria][key] = (section_criteria[criteria][key][0],
 			section_criteria[criteria][key][1] + "\\begin{itemize} *"  + key + "observation* *" + key + "suggestion* \end{itemize}")
 
+
+def get_evaluation_dict(studentname, version):
+	spreadsheet = google_login.open_by_key('1kg7BzshWQx3AL4QU13uPrkPxtzY7fY55RYtRIsOSenI').sheet1
+	header = spreadsheet.row_values(1)
+	version_index = header.index('version')
+	cell_list = spreadsheet.findall(studentname)
+	evaluation_dict = {}
+	for cell in cell_list:
+		if int(spreadsheet.row_values(cell.row)[version_index]) == int(version):
+			student_performance = spreadsheet.row_values(cell.row)
+			evaluation_dict = dict(zip(header, student_performance))
+
+	if evaluation_dict == {}:
+		return "student does not exist"
+
+	return evaluation_dict
+
+	#old code for making evaluation_dict
+	"""feedback_file = open('feedback.csv', 'r')
+	feedbackreader = csv.reader(feedback_file)
+	header = feedbackreader.next()
+	studentname_index = header.index('studentname')
+	version_index = header.index('version')
+	evaluation_dict = {}
+
+	for row in feedbackreader:
+		if row[studentname_index] == studentname and int(row[version_index]) == version:
+			student_performance = row
+			evaluation_dict = dict(zip(header, student_performance))
+
+	if evaluation_dict == {}:
+		return "student does not exist"
+
+	return evaluation_dict"""
+
+
+
 #this function creates a dict with yes and nos depending on whether the student satisfies a criteria from design.
 #function also creates separate dictionaries for observations and suggestions. 
-def get_section_dict(section_name):
-	with open('feedback.csv', 'rb') as csvfile:
-		feedbackreader = csv.reader(csvfile)
-		all_criteria = feedbackreader.next()
-		all_criteria = [x.strip() for x in all_criteria]
-		student_performance = feedbackreader.next()
-
-		evaluation_dict = dict(zip(all_criteria, student_performance))
-
+def get_section_dict(evaluation_dict, section_name):
 	section_dict = {k:v for (k,v) in evaluation_dict.iteritems() if (section_name in k and k[-1].isdigit()) }
 	observations_dict = {k:v for (k,v) in evaluation_dict.iteritems() if ("observation" in k and section_name in k) }
 	suggestions_dict = {k:v for (k,v) in evaluation_dict.iteritems() if ("suggestion" in k and section_name in k ) }
 
 	if section_name == "codequality":
 		observations_dict["codequality1observation"] =  "".join(evaluation_dict["codequality1"].split(",")).strip()
-		#" ".join(" ".join(evaluation_dict["codequality1"].split(",")).split(" ")) #"".join(evaluation_dict["codequality1"].split(","))
 		suggestions_dict["codequality1suggestion"] = evaluation_dict["codequality1suggestion"]
 
 	if section_name == "studentinfo":
@@ -62,14 +94,8 @@ def get_section_dict(section_name):
 	return section_dict, observations_dict, suggestions_dict
 
 #to get student name and personal message. 
-def get_student_info():
+def get_student_info(evaluation_dict):
 	student_info = {}
-	with open('feedback.csv', 'rb') as csvfile:
-		feedbackreader = csv.reader(csvfile)
-		all_criteria = feedbackreader.next()
-		all_criteria = [x.strip() for x in all_criteria]
-		student_performance = feedbackreader.next()
-		evaluation_dict = dict(zip(all_criteria, student_performance))
 	student_info["studentname"] =  evaluation_dict["studentname"]
 	student_info["personalmessage"] =  evaluation_dict["personalmessage"]
 	student_info["version"] = evaluation_dict["version"]
@@ -77,9 +103,8 @@ def get_student_info():
 
 
 #this function creates appropriate statements for inserting in evaluation. 
-def get_section_evaluation(section_name):
-	
-	section_dict, observations_dict, suggestions_dict = get_section_dict(section_name)
+def get_section_evaluation(evaluation_dict, section_name):
+	section_dict, observations_dict, suggestions_dict = get_section_dict(evaluation_dict, section_name)
 	section_evaluation = {}
 	section_conclusion = section_name + "conclusion"
 	section_evaluation[section_conclusion] = "Meets Specifications"
@@ -106,13 +131,13 @@ def get_section_evaluation(section_name):
 	return section_evaluation
 
 #creating a dictionary of all appropriate statements and placeholders. 
-def get_all_evaluation():
+def get_all_evaluation(evaluation_dict):
 	all_evaluation = {}
 	section_names = ['design', 'responsive', 'separationofconcerns', 'codequality']
 	for section in section_names:
-		all_evaluation.update(get_section_evaluation(section))
+		all_evaluation.update(get_section_evaluation(evaluation_dict, section))
 
-	all_evaluation.update(get_student_info())
+	all_evaluation.update(get_student_info(evaluation_dict))
 	all_evaluation["projectconclusion"] = "Project Meets Specifications"
 	for section in section_names:
 		if all_evaluation[section+'conclusion'] == "Does Not Meet Specifications":
@@ -121,8 +146,8 @@ def get_all_evaluation():
 	return all_evaluation
 
 #inserts the evaluation into the latex file. 
-def insert_into_latex():
-	all_evaluation = get_all_evaluation()
+def insert_into_latex(evaluation_dict):
+	all_evaluation = get_all_evaluation(evaluation_dict)
 	template = open("evaluation_template.tex", 'r')
 	evaluation_file_name = "Mockup To Website - Project Evaluation v" + all_evaluation["version"] + " - " + all_evaluation['studentname'] + ".tex"
 	#Mockup To Website - Project Evaluation v[number] - [student name]
@@ -130,7 +155,11 @@ def insert_into_latex():
 
 	for line in template:
 		for key, value in all_evaluation.iteritems():
-			if value.strip() in ["\item \\textcolor{darkolivegreen}{" + "}", "\item \\textcolor{caputmortuum}{" + "}"]:
+			if value: 
+				value = value.strip()
+			else:
+				value = ''
+			if value in ["\item \\textcolor{darkolivegreen}{" + "}", "\item \\textcolor{caputmortuum}{" + "}"]:
 				value = ''
 			line = line.replace('*' + key + '*', value)
 		generated_evaluation.write(line)
@@ -138,7 +167,19 @@ def insert_into_latex():
 	template.close()
 
 
-insert_into_latex()
+if __name__ == "__main__":
+	if len(sys.argv) != 3:
+		print "Usage: process_csv_create_latex.py <studentname> <version>"
+	else: 
+		studentname, version = sys.argv[1:] 
+		username = input("enter your knowlabs email: ")
+		password = getpass.getpass('Enter your knowlabs password: ')
+		google_login = gspread.login(username, password)    	
+		evaluation_dict =  get_evaluation_dict(studentname, int(version))
+    	print evaluation_dict, type(evaluation_dict)
+    	insert_into_latex(evaluation_dict)
+
+    	
 
 
 
