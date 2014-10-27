@@ -19,3 +19,5 @@ latex!
 
 1. prefilled suggestions for each of the “suggestion fields” in the form. 
 2. write code for exceeds specifications. 
+3. activate suggestions for each section even when the project meets specification
+4. upload the eval to drive and update spreadsheet
