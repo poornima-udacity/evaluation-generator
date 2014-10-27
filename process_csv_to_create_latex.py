@@ -43,7 +43,6 @@ for criteria in section_criteria:
 			section_criteria[criteria][key][1] + "\\begin{itemize} *"  + key + "observation* *" + key + "suggestion* \end{itemize}")
 
 
-
 def get_evaluation_dict(studentname, version):
 	""" call the google server and get the student evaluation from the form csv. return a dictionary 
 	of the evaluation response from the csv file. 
