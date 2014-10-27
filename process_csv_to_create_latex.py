@@ -7,6 +7,9 @@ import gspread
 import getpass
 import os
 
+reload(sys)
+sys.setdefaultencoding("utf-8")
+
 
 #_criteria dicts define the statement to put in the evaluation for wheather or not a student meets specification on a criteria.
 design_criteria = {"design1" : ("The DOM tree correctly represents the page content.", 
