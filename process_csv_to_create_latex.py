@@ -33,14 +33,18 @@ section_criteria = {"design" : design_criteria, "responsive" : responsive_criter
 
 #this code is to ensure the list formatting of observations and suggestions. Observation and suggestion list will show up only in the case when a criteria is not met
 for criteria in section_criteria:
-	print type(criteria), type(section_criteria[criteria])
+	#print type(criteria), type(section_criteria[criteria])
 	for key in section_criteria[criteria]:
-		print section_criteria[criteria][key][1]
+		#print section_criteria[criteria][key][1]
 		section_criteria[criteria][key] = (section_criteria[criteria][key][0],
 			section_criteria[criteria][key][1] + "\\begin{itemize} *"  + key + "observation* *" + key + "suggestion* \end{itemize}")
 
 
+
 def get_evaluation_dict(studentname, version):
+	""" call the google server and get the student evaluation from the form csv. return a dictionary 
+	of the evaluation response from the csv file. 
+	"""
 	spreadsheet = google_login.open_by_key('1kg7BzshWQx3AL4QU13uPrkPxtzY7fY55RYtRIsOSenI').sheet1
 	header = spreadsheet.row_values(1)
 	version_index = header.index('version')
@@ -56,29 +60,13 @@ def get_evaluation_dict(studentname, version):
 
 	return evaluation_dict
 
-	#old code for making evaluation_dict
-	"""feedback_file = open('feedback.csv', 'r')
-	feedbackreader = csv.reader(feedback_file)
-	header = feedbackreader.next()
-	studentname_index = header.index('studentname')
-	version_index = header.index('version')
-	evaluation_dict = {}
-
-	for row in feedbackreader:
-		if row[studentname_index] == studentname and int(row[version_index]) == version:
-			student_performance = row
-			evaluation_dict = dict(zip(header, student_performance))
-
-	if evaluation_dict == {}:
-		return "student does not exist"
-
-	return evaluation_dict"""
-
-
 
 #this function creates a dict with yes and nos depending on whether the student satisfies a criteria from design.
 #function also creates separate dictionaries for observations and suggestions. 
 def get_section_dict(evaluation_dict, section_name):
+	""" separate the evaluation for each section from the section dictionary. This will create a separate observation
+	and suggestion dictionary.
+	"""
 	section_dict = {k:v for (k,v) in evaluation_dict.iteritems() if (section_name in k and k[-1].isdigit()) }
 	observations_dict = {k:v for (k,v) in evaluation_dict.iteritems() if ("observation" in k and section_name in k) }
 	suggestions_dict = {k:v for (k,v) in evaluation_dict.iteritems() if ("suggestion" in k and section_name in k ) }
@@ -95,6 +83,8 @@ def get_section_dict(evaluation_dict, section_name):
 
 #to get student name and personal message. 
 def get_student_info(evaluation_dict):
+	""" returns the dictionary of student specific information - name, personalmessage and project version. 
+	"""
 	student_info = {}
 	student_info["studentname"] =  evaluation_dict["studentname"]
 	student_info["personalmessage"] =  evaluation_dict["personalmessage"]
@@ -104,6 +94,9 @@ def get_student_info(evaluation_dict):
 
 #this function creates appropriate statements for inserting in evaluation. 
 def get_section_evaluation(evaluation_dict, section_name):
+	""" create a dictionary of the evaluation for the given section in a format that can be directly inserted in 
+	the tex file. 
+	"""
 	section_dict, observations_dict, suggestions_dict = get_section_dict(evaluation_dict, section_name)
 	section_evaluation = {}
 	section_conclusion = section_name + "conclusion"
@@ -132,6 +125,8 @@ def get_section_evaluation(evaluation_dict, section_name):
 
 #creating a dictionary of all appropriate statements and placeholders. 
 def get_all_evaluation(evaluation_dict):
+	""" loop over all the sections and creates the appropriate text for all the sections to be inserted in tex.
+	"""
 	all_evaluation = {}
 	section_names = ['design', 'responsive', 'separationofconcerns', 'codequality']
 	for section in section_names:
@@ -147,12 +142,12 @@ def get_all_evaluation(evaluation_dict):
 
 #inserts the evaluation into the latex file. 
 def insert_into_latex(evaluation_dict):
+	""" inserting the evaluation dictionary in the appropriate placeholders.
+	"""
 	all_evaluation = get_all_evaluation(evaluation_dict)
 	template = open("evaluation_template.tex", 'r')
 	evaluation_file_name = "Mockup To Website - Project Evaluation v" + all_evaluation["version"] + " - " + all_evaluation['studentname'] + ".tex"
-	#Mockup To Website - Project Evaluation v[number] - [student name]
 	generated_evaluation = open(evaluation_file_name, 'w')
-
 	for line in template:
 		for key, value in all_evaluation.iteritems():
 			if value: 
@@ -167,6 +162,11 @@ def insert_into_latex(evaluation_dict):
 	template.close()
 	evaluation_file_name = "\ ".join(evaluation_file_name.split(" "))
 	os.system("pdflatex " + evaluation_file_name)
+	#following code deletes the generated files. 
+	aux_files= [evaluation_file_name[:-3] + "aux", evaluation_file_name[:-3] + "log"]
+	for aux in aux_files:
+		os.system("rm " + aux)
+
 
 
 if __name__ == "__main__":
@@ -178,7 +178,7 @@ if __name__ == "__main__":
 		password = getpass.getpass('Enter your knowlabs password: ')
 		google_login = gspread.login(username, password)    	
 		evaluation_dict =  get_evaluation_dict(studentname, int(version))
-    	print evaluation_dict, type(evaluation_dict)
+    	#print evaluation_dict, type(evaluation_dict)
     	insert_into_latex(evaluation_dict)
 
     	
